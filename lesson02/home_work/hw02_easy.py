@@ -13,13 +13,51 @@
 
 # Подсказка: воспользоваться методом .format()
 
+fruits = ["яблоко", "банан", "киви", "арбуз"]
+c = 0
+while c < len(fruits):
+    print ('{}.{}{}'.format(c+1, (7-len(fruits[c]))*' ', fruits[c]))
+    c += 1
 
 # Задача-2:
 # Даны два произвольные списка.
 # Удалите из первого списка элементы, присутствующие во втором списке.
 
+#способ 1:
+list1 = set([1, 3, 4, 'test', 'poo', 'foo', 'bar', 3])
+list2 = set([3, 2, 8, 'test', 'bar', 1, 3, 'poo'])
+
+list3 = list1 - list2
+list1 = list3
+print(list1)
+
+# способ 2:
+list1 = [1, 3, 4, 'test', 'poo', 'foo', 'bar', 3]
+list2 = [3, 2, 8, 'test', 'bar', 1, 3, 'poo']
+
+list1 = [x for x in list1 if x not in list2]
+print(list1)
+
+# способ 3:
+list1 = [1, 3, 4, 'test', 'poo', 'foo', 'bar', 3]
+list2 = [3, 2, 8, 'test', 'bar', 1, 3, 'poo']
+list3 = []
+for i in list1:
+    if i not in list2:
+        list3.append(i)
+list1 = list3
+print (list1)
 
 # Задача-3:
 # Дан произвольный список из целых чисел.
 # Получите НОВЫЙ список из элементов исходного, выполнив следующие условия:
 # если элемент кратен двум, то разделить его на 4, если не кратен, то умножить на два.
+
+num_list = [1, 3, 4, 6, 7, 8, 12, 24, 28]
+new_num_list = []
+for i in num_list:
+    if i % 2 == 0:
+        new_num_list.append(i/4)
+    elif i % 2 != 0:
+        new_num_list.append(i*2)
+print (new_num_list)
