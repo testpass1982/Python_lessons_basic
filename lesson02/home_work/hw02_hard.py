@@ -45,12 +45,31 @@ days_in_months = {
     "12":31
 }
 
-def date_is_correct(d):
-    d_arr = d.split(".")
-    result = ''
-    ##не закончил
-
-print(date_is_correct('01.11.1985'))
+def date_is_correct(date_str):
+    result = []
+    d_arr = date_str.split(".")
+    #check date:
+    try:
+        if int(d_arr[0]) in range(1, days_in_months[d_arr[1]]+1):
+            result.append('Дата введена корректно')
+        else:
+            result.append('Дата введена не корректно')
+    except KeyError:
+        result.append('Нет такого месяца в календаре')
+    #check month:
+    if d_arr[1] in days_in_months:
+        result.append('месяц введен корректно')
+    else:
+        result.append('месяц введен не корректно')
+    #check year:
+    if int(d_arr[2]) in range (1, 9999):
+        result.append('год введен корректно')
+    else:
+        result.append('год введен не корректно')
+    result = 'Результат проверки: \n'+', '.join(result)
+    return result
+  
+print(date_is_correct('01.22.1001'))
 
 # Задание-3: "Перевёрнутая башня" (Задача олимпиадного уровня)
 #
@@ -81,3 +100,23 @@ print(date_is_correct('01.11.1985'))
 #
 # Вход: 11
 # Выход: 5 3
+from math import sqrt
+N = 5
+blocks = [a*a for a in range(1, N)]
+floors = sum(a for a in range(1, len(blocks)+1))
+room_count = sum(blocks)
+
+print (blocks)
+print (room_count)
+print(floors)
+c = 0
+for i in range (1, floors):
+    c+=1
+    print(i, ':',)
+
+floor = 'hz'
+room = 'hz'
+result = 'этаж: {}, счет слева на этаже: {}'.format(floor, room)
+   
+
+

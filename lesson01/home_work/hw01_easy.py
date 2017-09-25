@@ -20,6 +20,7 @@ __author__ = 'Попов Анатолий Викторович'
 # for i in range(0, num1+1):
 #     print(i)
 
+#вот правильное решение:
 num = str(input('Enter your number: '))
 for i in range(0, len(num)):
     print(num[i])
