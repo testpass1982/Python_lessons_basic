@@ -9,7 +9,7 @@ eq_arr = equation.split(" ")
 x = 2.5
 k = -int(''.join(c for c in eq_arr[2] if c in digits))
 b = float(eq_arr[-1])
-y = k*x + b
+y = k * x + b
 print(y)
 
 # Задание-2: Дата задана в виде строки формата 'dd.mm.yyyy'.
@@ -27,48 +27,50 @@ date0 = '01.11.1985'
 
 # Примеры некорректных дат
 date1 = '01.22.1001'
-date2= '1.12.1001'
+date2 = '1.12.1001'
 date3 = '-2.10.3001'
 
 days_in_months = {
-    "01":31,
-    "02":30,
-    "03":31,
-    "04":30,
-    "05":31,
-    "06":30,
-    "07":31,
-    "08":31,
-    "09":30,
-    "10":31,
-    "11":30,
-    "12":31
+    "01": 31,
+    "02": 30,
+    "03": 31,
+    "04": 30,
+    "05": 31,
+    "06": 30,
+    "07": 31,
+    "08": 31,
+    "09": 30,
+    "10": 31,
+    "11": 30,
+    "12": 31
 }
+
 
 def date_is_correct(date_str):
     result = []
     d_arr = date_str.split(".")
-    #check date:
+    # check date:
     try:
-        if int(d_arr[0]) in range(1, days_in_months[d_arr[1]]+1):
+        if int(d_arr[0]) in range(1, days_in_months[d_arr[1]] + 1):
             result.append('Дата введена корректно')
         else:
             result.append('Дата введена не корректно')
     except KeyError:
         result.append('Нет такого месяца в календаре')
-    #check month:
+    # check month:
     if d_arr[1] in days_in_months:
         result.append('месяц введен корректно')
     else:
         result.append('месяц введен не корректно')
-    #check year:
-    if int(d_arr[2]) in range (1, 9999):
+    # check year:
+    if int(d_arr[2]) in range(1, 9999):
         result.append('год введен корректно')
     else:
         result.append('год введен не корректно')
-    result = 'Результат проверки: \n'+', '.join(result)
+    result = 'Результат проверки: \n' + ', '.join(result)
     return result
-  
+
+
 print(date_is_correct('01.22.1001'))
 
 # Задание-3: "Перевёрнутая башня" (Задача олимпиадного уровня)
@@ -101,36 +103,48 @@ print(date_is_correct('01.22.1001'))
 # Вход: 11
 # Выход: 5 3
 
-N = 25
-etazh = 0
-last_etazh = 1
+N = 13
+
 kom = 1
-floor = 1
 group = 1
-last_sum_group = 0
+last_in_prev_group = 0
 counter = 0
-result = 0
+room_on_floor = 0
+result_floor = 0
+floor_counter = 1
+rooms = []
+group_counter = 0
 
-#определяем номер группы и последний номер в предудыщей группе
-for kom in range (1, N):
-    if kom - last_sum_group == group**2:
-        group+=1
-        last_sum_group = kom
-        
-#определяем этаж
+# определяем номер группы и последний номер в предудыщей группе
+# for kom in range (1, N):
+#     if kom - last_in_prev_group == group**2:
+#         group+=1
+#         last_in_prev_group = kom
 
-#считаем порядковый номер на этаже        
-while counter < N-last_sum_group:
-    counter+=1
-    if counter>group:
-        result = counter%group
-    if counter%group ==0:
-        result = group
-        
+while kom < N:
+    if kom - last_in_prev_group == group ** 2:
+        group += 1
+        last_in_prev_group = kom
+    kom += 1
 
-print ("номер комнаты на этаже:", result)
-print (last_sum_group)
-print (group)
-   
+# считаем в блоке порядковые номера и этажи
+while counter < N - last_in_prev_group:
 
+    last_floor_in_prev_bloc = sum(range(1, group))
+    result_floor = last_floor_in_prev_bloc + floor_counter
+    counter += 1
 
+    # счетчик этажей в блоке
+    if counter % group == 0:
+        floor_counter += 1
+
+    # порядковые номера комнат на этаже
+    if counter > group:
+        room_on_floor = counter % group
+    if counter < group:
+        room_on_floor = counter
+    if counter % group == 0:
+        room_on_floor = group
+
+print('этаж', result_floor)
+print("счет слева на этаже:", room_on_floor)
