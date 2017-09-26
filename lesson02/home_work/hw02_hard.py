@@ -100,23 +100,37 @@ print(date_is_correct('01.22.1001'))
 #
 # Вход: 11
 # Выход: 5 3
-from math import sqrt
-N = 5
-blocks = [a*a for a in range(1, N)]
-floors = sum(a for a in range(1, len(blocks)+1))
-room_count = sum(blocks)
 
-print (blocks)
-print (room_count)
-print(floors)
-c = 0
-for i in range (1, floors):
-    c+=1
-    print(i, ':',)
+N = 25
+etazh = 0
+last_etazh = 1
+kom = 1
+floor = 1
+group = 1
+last_sum_group = 0
+counter = 0
+result = 0
 
-floor = 'hz'
-room = 'hz'
-result = 'этаж: {}, счет слева на этаже: {}'.format(floor, room)
+#определяем номер группы и последний номер в предудыщей группе
+for kom in range (1, N):
+    if kom - last_sum_group == group**2:
+        group+=1
+        last_sum_group = kom
+        
+#определяем этаж
+
+#считаем порядковый номер на этаже        
+while counter < N-last_sum_group:
+    counter+=1
+    if counter>group:
+        result = counter%group
+    if counter%group ==0:
+        result = group
+        
+
+print ("номер комнаты на этаже:", result)
+print (last_sum_group)
+print (group)
    
 
 
