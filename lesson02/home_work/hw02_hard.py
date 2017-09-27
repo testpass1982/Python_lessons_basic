@@ -103,7 +103,7 @@ print(date_is_correct('01.22.1001'))
 # Вход: 11
 # Выход: 5 3
 
-N = 13
+N = 11
 
 kom = 1
 group = 1
@@ -126,12 +126,12 @@ while kom < N:
         group += 1
         last_in_prev_group = kom
     kom += 1
-
+    
 # считаем в блоке порядковые номера и этажи
 while counter < N - last_in_prev_group:
 
-    last_floor_in_prev_bloc = sum(range(1, group))
-    result_floor = last_floor_in_prev_bloc + floor_counter
+    last_floor_in_prev_block = sum(range(1, group))
+    result_floor = last_floor_in_prev_block + floor_counter
     counter += 1
 
     # счетчик этажей в блоке
@@ -146,5 +146,5 @@ while counter < N - last_in_prev_group:
     if counter % group == 0:
         room_on_floor = group
 
-print('этаж', result_floor)
+print('этаж: ', result_floor)
 print("счет слева на этаже:", room_on_floor)
