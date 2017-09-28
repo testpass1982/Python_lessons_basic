@@ -5,12 +5,26 @@
 # Для решения задачи не используйте встроенные функции и функции из модуля math.
 
 def my_round(number, ndigits):
-    pass
+    rounded_arr = str(number)
+    rounded_arr = rounded_arr.split('.')
+    res = rounded_arr[1]
+    for i in res:
+        if res.index(i) <= ndigits:
+            result = res[:ndigits]
+    
+    if int(result[-1])>=5:
+        print(int(result[-2])+1)
+    else:
+        print(int(result[-2])-1)
+    print (result)
+    
+            
+    return result
 
 
 print(my_round(2.1234567, 5))
-print(my_round(2.1999967, 5))
-print(my_round(2.9999967, 5))
+# print(my_round(2.1999967, 5))
+# print(my_round(2.9999967, 5))
 
 
 # Задание-2:
@@ -19,10 +33,10 @@ print(my_round(2.9999967, 5))
 # Билет считается счастливым, если сумма его первых и последних цифр равны.
 # !!!P.S.: функция не должна НИЧЕГО print'ить
 
-def lucky_ticket(ticket_number):
-    pass
-
-
-print(lucky_ticket(123006))
-print(lucky_ticket(12321))
-print(lucky_ticket(436751))
+# def lucky_ticket(ticket_number):
+#     pass
+#    
+#    
+# print(lucky_ticket(123006))
+# print(lucky_ticket(12321))
+# print(lucky_ticket(436751))
