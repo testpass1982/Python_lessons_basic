@@ -8,16 +8,41 @@
 # Вывод: 1 17/42  (результат обязательно упростить и выделить целую часть)
 # Ввод: -2/3 - -2
 # Вывод: 1 1/3
-def find_divider(x, y):
-    i=2
-    while i <= x*y:
-        if i%x==0 and i%y==0:
-            return i
-        else:
-            return None
-        i+=1
+from fractions import Fraction
 
-print(find_divider(6, 7))
+def fract_ops(fract):
+    fract = fract.split(' ')
+    fract1 = []
+    fract2 = []
+    for i in fract:
+        if i=='+' or i=='-':
+            fract1=fract[:fract.index(i)]
+            fract2=fract[fract.index(i)+1:]
+            operation = i
+    result = operation, fract1, fract2
+    return result
+
+def return_fraction(arr):
+    if len(arr)>1:
+        if '-' not in arr[0]:
+            result = Fraction(arr[0])+Fraction(arr[1])
+        if '-' in arr[0]:
+            result = Fraction(arr[0])+Fraction('-'+(arr[1]))
+    else:
+        return Fraction(arr[0])
+    return result
+
+def fract_calc(fract):
+    fract = fract_ops(fract)
+    if fract[0] == '+':
+        result = return_fraction(fract[1])+return_fraction(fract[2])
+    if fract[0] == '-':
+        result = return_fraction(fract[1])-return_fraction(fract[2])
+    str_result = str(result.numerator//result.denominator) + ' ' + str(result.numerator%result.denominator)+'/'+str(result.denominator)
+    return str_result
+
+print(fract_calc('5/6 + 4/7'))
+print(fract_calc('-2/3 - -2'))
 
 # Задание-2:
 # Дана ведомость расчета заработной платы (файл "data/workers").
@@ -26,6 +51,7 @@ print(find_divider(6, 7))
 # то их ЗП уменьшается пропорционально, а за заждый час переработки
 # они получают удвоенную ЗП, пропорциональную норме.
 # Кол-во часов, которые были отработаны, указаны в файле "data/hours_of"
+
 
 
 # Задание-3:
