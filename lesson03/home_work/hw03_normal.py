@@ -61,15 +61,21 @@ print(my_filter(None, [-14, 19, 21, 'test', 'woop']))
 # Задача-4:
 # Даны четыре точки А1(х1, у1), А2(x2 ,у2), А3(x3 , у3), А4(х4, у4).
 # Определить, будут ли они вершинами параллелограмма.
-
+from math import sqrt
 A1=(1, 1)
 A2=(2, 4)
 A3=(7, 4)
 A4=(6, 1)
+def calc_dist(p1, p2):
+    x1, x2, y1, y2 = p1[0], p2[0], p1[1], p2[1]
+    return round(sqrt((x2-x1)**2+(y2-y1)**2), 3)
 
-def is_par(bl, tl, tr, br):
-    if br[0]-bl[0] == tr[0]-tl[0] and tl[1]-bl[1] == tr[1]-br[1]:
+def is_par(p1, p2, p3, p4):
+    if calc_dist(p2, p1) == calc_dist(p4, p3) and calc_dist(p3, p2) == calc_dist(p4, p1):
+        print('the lengths of opposite sides are equal, this is the parallelogram')
         return True
     else:
+        print('the lengths of opposite sides are NOT equal, this is NOT the parallelogram')
         return False
+
 print(is_par(A1, A2, A3, A4))
