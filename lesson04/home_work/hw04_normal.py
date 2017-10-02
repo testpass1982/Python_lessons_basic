@@ -71,11 +71,24 @@ print(result)
 
 #without re
 print ("without re")
-def find_all(line):
-	
-	return True
-print(find_all(line_2))
 
+def find_all(line):
+    i = 2
+    arr = []
+    arr1 = []
+    while i<len(line): 
+        if line[i].isupper() and line[i-1].islower() and line[i-2].islower():
+            arr.append(line[i:])
+        i+=1
+    for word in arr:
+        j = 0
+        while j < len(word):
+            if word[j].islower():
+                arr1.append(word[:j])
+    print(arr1)
+    return True
+
+print(find_all(line))
 # Задание-3:
 # Напишите скрипт, заполняющий указанный файл (самостоятельно задайте имя файла)
 # произвольными целыми цифрами, в результате в файле должно быть
