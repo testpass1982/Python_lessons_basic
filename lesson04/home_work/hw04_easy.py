@@ -7,8 +7,8 @@
 # [1, 2, 4, 0] --> [1, 4, 16, 0]
 
 def sq_gen(lst):
-    res = [x**2 for x in lst]
-    return res
+    result = [x**2 for x in lst]
+    return result
 
 print(sq_gen([1, 2, 4, 0]))
 
@@ -17,8 +17,8 @@ print(sq_gen([1, 2, 4, 0]))
 # Получить список фруктов, присутствующих в обоих исходных списках.
 
 def tut_fruit(lst1, lst2):
-    res = [x for x in lst1 if x in lst2]
-    return res
+    result = [x for x in lst1 if x in lst2]
+    return result
 
 fruits1 = ['apple', 'orange', 'pineapple', 'banana', 'cherry']
 fruits2 = ['orange', 'banana', 'melon', 'cherry']

@@ -21,9 +21,24 @@ line = 'mtMmEZUOmcqWiryMQhhTxqKdSTKCYEJlEZCsGAMkgAYEOmHBSQsSUHKvSfbmxULaysmNO'\
        'zTYwZAiRwycdlHfyHNGmkNqSwXUrxGc'
 
 #with regexp
-import re
+# import re
 
-pattern = re.compile()
+# result = re.sub('[A-Z]{1,}', " ", line).split(" ")
+# print(result)
+
+# without regexp
+# def sub_line(line):
+	# for i in line:
+		# if i.isupper():
+			# line=line.replace(i, " ")
+	# line = line.split(' ')
+	# for j in line[:]:
+		# if j=='':
+			# line.remove(j)
+	# return line
+	
+# print("line with NO capital letters (without regex):")
+# print(sub_line(line))
 
 # Задание-2:
 # Вывести символы в верхнем регистре, слева от которых находятся
@@ -32,6 +47,7 @@ pattern = re.compile()
 # "GAMkgAYEOmHBSQsSUHKvSfbmxULaysmNOGIPHpEMujalpPLNzRWXfwHQqwksrFeipEUlTLec"
 # нужно получить список строк: ['AY', 'NOGI', 'P']
 # Решить задачу двумя способами: с помощью re и без.
+import re
 
 line_2 = 'mtMmEZUOmcqWiryMQhhTxqKdSTKCYEJlEZCsGAMkgAYEOmHBSQsSUHKvSfbmxULaysm'\
        'NOGIPHpEMujalpPLNzRWXfwHQqwksrFeipEUlTLeclMwAoktKlfUBJHPsnawvjPhfgewV'\
@@ -48,6 +64,17 @@ line_2 = 'mtMmEZUOmcqWiryMQhhTxqKdSTKCYEJlEZCsGAMkgAYEOmHBSQsSUHKvSfbmxULaysm'\
        'uXBqHFjvihuNGEEFsfnMXTfptvIOlhKhyYwxLnqOsBdGvnuyEZIheApQGOXWeXoLWiDQN'\
        'JFaXiUWgsKQrDOeZoNlZNRvHnLgCmysUeKnVJXPFIzvdDyleXylnKBfLCjLHntltignbQ'\
        'oiQzTYwZAiRwycdlHfyHNGmkNqSwXUrxGC'
+
+pattern = re.compile('[a-z]{2}([A-Z]{1,})[A-Z]{2}')
+result = re.findall(pattern, line_2)
+print(result)
+
+#without re
+print ("without re")
+def find_all(line):
+	
+	return True
+print(find_all(line_2))
 
 # Задание-3:
 # Напишите скрипт, заполняющий указанный файл (самостоятельно задайте имя файла)
