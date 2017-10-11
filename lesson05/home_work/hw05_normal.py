@@ -1,6 +1,8 @@
 import hw05_easy
 import os
 import sys
+
+# print ('sys.argv', sys.argv)
 # Задача-1:
 # Напишите небольшую консольную утилиту,
 # позволяющую работать с папками текущей директории.
@@ -17,7 +19,7 @@ import sys
 # оформленные в виде соответствующих функций,
 # и импортированные в данный файл из easy.py
 
-def print_help():
+def print_help(param=None):
     print("help - получение справки:")
     print("1. goto <dir_name> - перейти в папку")
     print("2. show - просмотреть содержимое папки")
@@ -25,7 +27,7 @@ def print_help():
     print("4. mkdir <dir_name> - создание папки")
     print("5. ping - тестовый ключ")
 
-def ping():
+def ping(param=None):
     print("pong")
 
 do = {
@@ -38,9 +40,9 @@ do = {
 }
 
 try:
-    dir_name = sys.argv[2]
+    param = sys.argv[2]
 except IndexError:
-    dir_name = None
+    param = None
 
 try:
     key = sys.argv[1]
@@ -49,7 +51,7 @@ except IndexError:
 
 if key:
     if do.get(key):
-        do[key]()
+        do[key](param)
     else:
         print("Задан неверный ключ")
         print("Укажите ключ help для получения справки")
