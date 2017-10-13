@@ -42,17 +42,17 @@ number = """
 71636269561882670428252483600823257530420752963450"""
 a = {}
 b = {}
-for i in range(0, len(number)-1):
+for i in range(0, len(number)):
     a[i] = [int(x) for x in number[i:i+5] if '\n' not in number[i: i+5]]
 for key in a:
     product=1
     if len(a[key])==5:
         for x in a[key]:
-            product *=x
+            product *= x
             b[key] = product
 start = max(b, key=lambda i: b[i])
 
-print ('максимальное произведение 5-ти цифр: ', b[max(b, key=lambda i: b[i])], 'смещение: ', start)
+print ('максимальное произведение 5-ти цифр: ', b[start], 'смещение: ', start)
 
 # Задание-3 (Ферзи):
 # Известно, что на доске 8×8 можно расставить 8 ферзей так, чтобы они не били
