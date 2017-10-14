@@ -36,7 +36,7 @@ do = {
     "show": hw05_easy.print_folders_in_cwd,
     "del": hw05_easy.remove_folder,
     "mkdir": hw05_easy.create_folder,
-    "ping": ping
+    "ping": ping,
 }
 
 try:
