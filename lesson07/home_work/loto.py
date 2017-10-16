@@ -61,55 +61,61 @@ import random
 class Player(object):
     def __init__(self):
         self.points = 90
-        print ('The game started')
-        
-    def makeNewCard(self):
-        card = ''
-        for i in range (1, 28):
-            if i%9==0:
-                card+='\'
-            card+=str()
-        pass
-            
-    def getCard(self):
-        pass
-    
-    def drawCard(self):
-        print ('------ Ваша карточка -----')
-        print(self.getCard())
-        print ('--------------------------')
-    
+        print('The game started')
+        self.card=Card()
+
     def makeTurn(self):
         #выбрать вариант хода: зачеркнуть цифру? (y/n), продолжить (n)
         #выйти из игры (q)
-        turn = input('''Make a choice for your turn:
-"y" for cross the number in your card, 
-"n" for next turn, 
-"q" for quit
-''')
+        print('''Make a choice for your turn:
+- "y" for cross the number in your card, 
+- "n" for next turn, 
+- "q" for quit
+        ''')
+        turn = input("Your choice: ")
         if turn == 'y':
             print('you cross the number')
-            self.drawCard()
+            self.updateCard()
         if turn == 'n':
             print('now we pull another keg')
         if turn == 'q':
             print('thank you for playing!')
             Quit.confirm=True
         if turn not in ('y', 'n', 'q'):
-            print ('you have to make a choice: only "y", "n", or "q"')    
-        
+            print ('!!! you have to make a choice: only "y", "n", or "q" !!!')
+
+    def updateCard(self):
+        pass
+
 class Human(Player):
-     def __init__(self):
-         print ('Hello, human!')
-         print ('Here is your card, human!')
-         self.drawCard()
- 
+    def __init__(self):
+        super().__init__()
+        print ('Hello, human!')
+        print ('Here is your card, human!')
+        print (self.card.makeNewCard())
+
 class Computer(Player):
      pass
 
 class Card(object):
-    def __init__(self, numbers):
+    def __init__(self):
+        self.all_cards = [x for x in range(1, 91)]
+        self.card_limit = 27
+        self.numbers_total = 15
+
+    def makeNewCard(self):
+        self.random_numbers = random.sample(self.all_cards, self.numbers_total)
+        self.card = [['' for x in range(0, 9)] for e in range(3)]
+
+        return self.blank_card
+
+    def getCard(self):
         pass
+
+    def drawCard(self):
+        print('------ Ваша карточка -----')
+        print(self.getCard())
+        print('--------------------------')
     
 class Bag(object):
     def __init__(self):
