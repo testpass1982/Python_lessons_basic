@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-
+import random
 """
 == Лото ==
 
@@ -57,3 +57,101 @@
 модуль random: http://docs.python.org/3/library/random.html
 
 """
+
+class Player(object):
+    def __init__(self):
+        self.points = 90
+        print ('The game started')
+        
+    def makeNewCard(self):
+        card = ''
+        for i in range (1, 28):
+            if i%9==0:
+                card+='\'
+            card+=str()
+        pass
+            
+    def getCard(self):
+        pass
+    
+    def drawCard(self):
+        print ('------ Ваша карточка -----')
+        print(self.getCard())
+        print ('--------------------------')
+    
+    def makeTurn(self):
+        #выбрать вариант хода: зачеркнуть цифру? (y/n), продолжить (n)
+        #выйти из игры (q)
+        turn = input('''Make a choice for your turn:
+"y" for cross the number in your card, 
+"n" for next turn, 
+"q" for quit
+''')
+        if turn == 'y':
+            print('you cross the number')
+            self.drawCard()
+        if turn == 'n':
+            print('now we pull another keg')
+        if turn == 'q':
+            print('thank you for playing!')
+            Quit.confirm=True
+        if turn not in ('y', 'n', 'q'):
+            print ('you have to make a choice: only "y", "n", or "q"')    
+        
+class Human(Player):
+     def __init__(self):
+         print ('Hello, human!')
+         print ('Here is your card, human!')
+         self.drawCard()
+ 
+class Computer(Player):
+     pass
+
+class Card(object):
+    def __init__(self, numbers):
+        pass
+    
+class Bag(object):
+    def __init__(self):
+        self.reserve = [x for x in range (1, 91)]
+        
+    def remove_from_bag(self, number):
+        reserve.remove(number)
+
+class Keg(object):
+    pass
+
+class Quit(object):
+    def __init__(self, choice):
+        self.choice = choice
+    
+    @property
+    def confirm(self):
+        if self.choice == 'yes':
+            return False
+        if self.choice == 'no':
+            return True
+    
+
+if __name__ == '__main__':
+    print ("""These are rules of our game:
+1 rule
+2 rule
+Enjoy our game!
+----------------------------""")
+    
+    bag = Bag()
+    choice = input('Start new game? (yes/no) : ')
+    done = Quit(choice)
+    if not done.confirm:
+        player = Human()
+    while not done.confirm:
+        
+        player.makeTurn()
+        
+    print ('Goodbye!')
+    
+
+        
+            
+            
