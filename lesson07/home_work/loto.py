@@ -60,42 +60,66 @@ import random
 
 class Player(object):
     def __init__(self):
-        self.points = 90
-        print('The game started')
         self.card=Card()
+        self.points = 0
 
-    def makeTurn(self):
+    def mark(self, barrel=None):
+        if barrel in self.card.getCard():
+            print ('You got it! Computer\'s turn!')
+            self.points+=1
+        else:
+            print('It is not in your card! Game over! You lose!')
+            Quit.confirm=True
+
+    def next(self, barrel=None):
+        if barrel in self.card.getCard():
+            print ('...but it is in your card! You lose!')
+            Quit.confirm=True
+        else:
+            pass
+
+class Human(Player):
+    def __init__(self):
+        super().__init__()
+        # print ('Hello, human!')
+        # print ('Here is your card, human!')
+        self.card.makeNewCard()
+
+    def makeTurn(self, barrel=None):
         #выбрать вариант хода: зачеркнуть цифру? (y/n), продолжить (n)
         #выйти из игры (q)
+        self.card.drawCard()
+        print('We pull a keg: ', barrel)
+
         print('''Make a choice for your turn:
 - "y" for cross the number in your card, 
 - "n" for next turn, 
-- "q" for quit
-        ''')
+- "q" for quit''')
+
         turn = input("Your choice: ")
         if turn == 'y':
-            print('you cross the number')
-            self.updateCard()
+            print('You decide to stike out the number', barrel)
+            self.mark(barrel)
         if turn == 'n':
-            print('now we pull another keg')
+            print('You decide to pull another bag...')
+            self.next(barrel)
         if turn == 'q':
             print('thank you for playing!')
             Quit.confirm=True
         if turn not in ('y', 'n', 'q'):
             print ('!!! you have to make a choice: only "y", "n", or "q" !!!')
-
-    def updateCard(self):
-        pass
-
-class Human(Player):
-    def __init__(self):
-        super().__init__()
-        print ('Hello, human!')
-        print ('Here is your card, human!')
-        print (self.card.makeNewCard())
+            self.makeTurn()
 
 class Computer(Player):
-     pass
+     def __init__(self):
+         super().__init__()
+         self.card.makeNewCard()
+
+     def makeTurn(self, barrel=None):
+         print('Computer turn')
+         self.card.drawCard()
+         if barrel in self.card.getCard():
+             self.card.getCard()[self.card.getCard().index(barrel)]='X'
 
 class Card(object):
     def __init__(self):
@@ -103,29 +127,42 @@ class Card(object):
         self.card_limit = 27
         self.numbers_total = 15
 
+    #создаем новую карту
     def makeNewCard(self):
+        c = 0
         self.random_numbers = random.sample(self.all_cards, self.numbers_total)
-        self.card = [['' for x in range(0, 9)] for e in range(3)]
+        self.card = [[' ' for x in range(9)] for e in range(3)]
+        for i in range(len(self.card)):
+            for j in range(len(self.card[i])):
+                if j <= 4:
+                    self.card[i][j]=self.random_numbers[c]
+                    c+=1
+        for i in range(len(self.card)):
+            random.shuffle(self.card[i])
+        return self.card
 
-        return self.blank_card
-
-    def getCard(self):
-        pass
+    #тут мы храним текущее состояние карты с изменениями
+    def getCard(self, barrel = None):
+        if barrel:
+            self.card[self.card.index(barrel)]='X'
+            return self.card
+        else:
+            return self.card
 
     def drawCard(self):
-        print('------ Ваша карточка -----')
-        print(self.getCard())
+        print('------ Loto card -----')
+        for i in self.getCard():
+            print(' '.join(map(str, i)))
         print('--------------------------')
     
 class Bag(object):
     def __init__(self):
         self.reserve = [x for x in range (1, 91)]
-        
-    def remove_from_bag(self, number):
-        reserve.remove(number)
 
-class Keg(object):
-    pass
+    def pull(self):
+        barrel = random.choice(self.reserve)
+        self.reserve.remove(barrel)
+        return barrel
 
 class Quit(object):
     def __init__(self, choice):
@@ -145,16 +182,17 @@ if __name__ == '__main__':
 2 rule
 Enjoy our game!
 ----------------------------""")
-    
-    bag = Bag()
     choice = input('Start new game? (yes/no) : ')
     done = Quit(choice)
+    bag = Bag()
     if not done.confirm:
         player = Human()
+        computer = Computer()
     while not done.confirm:
-        
-        player.makeTurn()
-        
+        barrel = bag.pull()
+        player.makeTurn(barrel)
+        computer.makeTurn(barrel)
+
     print ('Goodbye!')
     
 
