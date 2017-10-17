@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import random
+import time
 """
 == Лото ==
 
@@ -58,57 +59,79 @@ import random
 
 """
 
+
 class Player(object):
     def __init__(self):
         self.card=Card()
         self.points = 0
 
     def mark(self, barrel=None):
-        if barrel in self.card.getCard():
-            print ('You got it! Computer\'s turn!')
+        if self.cardCheck(barrel):
+            time.sleep(2)
+            print('You got it! Now it\'s computer\'s turn!')
             self.points+=1
+            self.card.update(barrel)
         else:
-            print('It is not in your card! Game over! You lose!')
+            print('You made a mistake! Game over! You lose!')
             Quit.confirm=True
 
     def next(self, barrel=None):
-        if barrel in self.card.getCard():
+        if self.cardCheck(barrel)==True:
+            time.sleep(2)
             print ('...but it is in your card! You lose!')
             Quit.confirm=True
         else:
             pass
 
+    def cardCheck(self, barrel):
+        cm = self.card.getCard()
+        for row in cm:
+            for el in row:
+                if el == barrel:
+                    return True
+        return False
+
+
 class Human(Player):
     def __init__(self):
         super().__init__()
-        # print ('Hello, human!')
-        # print ('Here is your card, human!')
+        print ('Hello, human!')
+        print ('Here is your card, human!')
+        time.sleep(2)
         self.card.makeNewCard()
 
     def makeTurn(self, barrel=None):
         #выбрать вариант хода: зачеркнуть цифру? (y/n), продолжить (n)
         #выйти из игры (q)
+        print('------- Your card ----------')
         self.card.drawCard()
+        time.sleep(2)
         print('We pull a keg: ', barrel)
-
+        time.sleep(2)
         print('''Make a choice for your turn:
 - "y" for cross the number in your card, 
 - "n" for next turn, 
 - "q" for quit''')
 
-        turn = input("Your choice: ")
+        turn = input("Your choice -> ")
         if turn == 'y':
-            print('You decide to stike out the number', barrel)
+            print('You decide to stike out the number')
             self.mark(barrel)
         if turn == 'n':
             print('You decide to pull another bag...')
             self.next(barrel)
         if turn == 'q':
-            print('thank you for playing!')
+            print('''
+  ________                __                           ____                    __            _             __
+ /_  __/ /_  ____ _____  / /__   __  ______  __  __   / ______  _____   ____  / ____ ___  __(_____  ____ _/ /
+  / / / __ \/ __ `/ __ \/ //_/  / / / / __ \/ / / /  / /_/ __ \/ ___/  / __ \/ / __ `/ / / / / __ \/ __ `/ / 
+ / / / / / / /_/ / / / / ,<    / /_/ / /_/ / /_/ /  / __/ /_/ / /     / /_/ / / /_/ / /_/ / / / / / /_/ /_/  
+/_/ /_/ /_/\__,_/_/ /_/_/|_|   \__, /\____/\__,_/  /_/  \____/_/     / .___/_/\__,_/\__, /_/_/ /_/\__, (_)   
+                              /____/                                /_/            /____/        /____/   ''')
             Quit.confirm=True
-        if turn not in ('y', 'n', 'q'):
-            print ('!!! you have to make a choice: only "y", "n", or "q" !!!')
-            self.makeTurn()
+        while turn not in ('y', 'n', 'q'):
+            turn = input('You have to make a choice: only \'y\', \'n\', or \'q\': ')
+
 
 class Computer(Player):
      def __init__(self):
@@ -116,18 +139,23 @@ class Computer(Player):
          self.card.makeNewCard()
 
      def makeTurn(self, barrel=None):
-         print('Computer turn')
-         self.card.drawCard()
-         print (barrel)
-         print (barrel in self.card.getCard())
+        print('Computer turn...')
+        time.sleep(2)
+        print('----- Computer\'s card ------')
+        if self.cardCheck(barrel):
+            self.points+=1
+        self.card.update(barrel)
+        self.card.drawCard()
+
 
 class Card(object):
     def __init__(self):
         self.all_cards = [x for x in range(1, 91)]
         self.card_limit = 27
         self.numbers_total = 15
+        self.card = self.makeNewCard()
 
-    #создаем новую карту
+    # создаем новую карту
     def makeNewCard(self):
         c = 0
         self.random_numbers = random.sample(self.all_cards, self.numbers_total)
@@ -141,21 +169,32 @@ class Card(object):
             random.shuffle(self.card[i])
         return self.card
 
-    #тут мы храним текущее состояние карты с изменениями
-    def getCard(self):
-        self.card = self.makeNewCard()
-        return self.card
+    # тут мы храним текущее состояние карты с изменениями
+    def getCard(self, barrel=None):
+        self.c = self.card[:]
+        if self.update(barrel):
+            self.c = self.update(barrel)
+        return self.c
 
+    # печатаем карту
     def drawCard(self):
-        print('------- Loto card --------')
         for i in self.getCard():
             print(' '.join(map(str, i)))
-        print('--------------------------')
+        print('-----------------------------')
+
+    # обновляем карту в соответствии с бочонком
+    def update(self, barrel):
+        for row in self.card:
+            for el in range(len(row)):
+                if row[el] == barrel:
+                    row[el] = 'X'
+        return self.card
     
 class Bag(object):
     def __init__(self):
         self.reserve = [x for x in range (1, 91)]
 
+    # тащим из сумки бочонок
     def pull(self):
         barrel = random.choice(self.reserve)
         self.reserve.remove(barrel)
@@ -167,34 +206,45 @@ class Quit(object):
     
     @property
     def confirm(self):
-        if self.choice == 'yes':
+        if self.choice == 'y':
             return False
-        if self.choice == 'no':
+        if self.choice == 'n':
             return True
     
 
 if __name__ == '__main__':
-    print ("""These are rules of our game:
-1 rule
-2 rule
+    print ("""    ___________          __   ____ __________     ____________  _______________
+   /  _/_  __( )_____   / /  / __ /_  __/ __ \   /_  __/  _/  |/  / ____/ / / /
+   / /  / /  |// ___/  / /  / / / // / / / / /    / /  / // /|_/ / __/ / / / / 
+ _/ /  / /    (__  )  / /__/ /_/ // / / /_/ /    / / _/ // /  / / /___/_/_/_/  
+/___/ /_/    /____/  /_____\____//_/  \____/    /_/ /___/_/  /_/_____(_(_(_)   
+                                                                               
+Here are the rules for our game:
+1 we give you cards
+2 we pull a keg from bag and you check if keg is in your card
+3 the winner has the maximum points
 Enjoy our game!
 ----------------------------""")
-    choice = input('Start new game? (yes/no) : ')
+    choice = input('Start new game? (y/n) : ')
+    while choice not in ('y', 'n'):
+        choice = input('Please, input \'y\' or \'no\': ')
+
     done = Quit(choice)
     bag = Bag()
     if not done.confirm:
         player = Human()
         computer = Computer()
-    while not done.confirm:
+    while done.confirm==False:
         keg = bag.pull()
-        print(type(keg))
-        print(player.card)
         player.makeTurn(keg)
-        computer.makeTurn(keg)
-
-    print ('Goodbye!')
-    
-
-        
-            
-            
+        if not done.confirm:
+            computer.makeTurn(keg)
+        time.sleep(1)
+        print('Your points: ', player.points)
+        time.sleep(1)
+        print('Computer points: ', computer.points)
+        time.sleep(1)
+        if player.points == 15:
+            print('Player wins!')
+        elif computer.points == 15:
+            print('Computer wins!')
