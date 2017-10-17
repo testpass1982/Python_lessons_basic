@@ -118,7 +118,7 @@ class Human(Player):
             print('You decide to stike out the number')
             self.mark(barrel)
         if turn == 'n':
-            print('You decide to pull another bag...')
+            print('You decide to pull another keg...')
             self.next(barrel)
         if turn == 'q':
             print('''
