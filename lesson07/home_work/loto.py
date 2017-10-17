@@ -118,8 +118,8 @@ class Computer(Player):
      def makeTurn(self, barrel=None):
          print('Computer turn')
          self.card.drawCard()
-         if barrel in self.card.getCard():
-             self.card.getCard()[self.card.getCard().index(barrel)]='X'
+         print (barrel)
+         print (barrel in self.card.getCard())
 
 class Card(object):
     def __init__(self):
@@ -142,15 +142,12 @@ class Card(object):
         return self.card
 
     #тут мы храним текущее состояние карты с изменениями
-    def getCard(self, barrel = None):
-        if barrel:
-            self.card[self.card.index(barrel)]='X'
-            return self.card
-        else:
-            return self.card
+    def getCard(self):
+        self.card = self.makeNewCard()
+        return self.card
 
     def drawCard(self):
-        print('------ Loto card -----')
+        print('------- Loto card --------')
         for i in self.getCard():
             print(' '.join(map(str, i)))
         print('--------------------------')
@@ -189,9 +186,11 @@ Enjoy our game!
         player = Human()
         computer = Computer()
     while not done.confirm:
-        barrel = bag.pull()
-        player.makeTurn(barrel)
-        computer.makeTurn(barrel)
+        keg = bag.pull()
+        print(type(keg))
+        print(player.card)
+        player.makeTurn(keg)
+        computer.makeTurn(keg)
 
     print ('Goodbye!')
     
