@@ -115,7 +115,7 @@ class Human(Player):
 
         turn = input("Your choice -> ")
         if turn == 'y':
-            print('You decide to stike out the number')
+            print('You decide to strike out the number')
             self.mark(barrel)
         if turn == 'n':
             print('You decide to pull another keg...')
