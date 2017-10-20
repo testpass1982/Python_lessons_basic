@@ -1,3 +1,9 @@
+import logging
+import tkinter as tk
+from grab import Grab
+import re
+import urllib.request
+import gzip
 
 """ 
 == OpenWeatherMap ==
@@ -122,4 +128,63 @@ OpenWeatherMap — онлайн-сервис, который предостав�
         ...
 
 """
+
+class Application(tk.Frame):
+    def __init__(self, master=None):
+        tk.Frame.__init__(self, master)
+        self.grid()
+        self.createWidgets()
+        self.appid = Appid()
+        self.g = Grab()
+        logging.basicConfig(level=logging.DEBUG)
+
+    def createWidgets(self):
+        self.label = tk.Label(self, text = """This is my weather app.
+Push button \'Get App_id\' below to register our app
+on OpenWeatherMap web-service""")
+        self.label.pack()
+        self.quitButton = tk.Button(self, text = 'Quit', command=lambda: self.quit())
+        self.getappid_button = tk.Button(self, text = 'Get App id', command=lambda: self.getappid())
+        self.get_cities_list_button = tk.Button(self, text = 'Get cities list', command=lambda: self.get_cities_list())
+        self.getappid_button.pack()
+        self.get_cities_list_button.pack()
+        self.quitButton.pack()
+
+    def getappid(self):
+        self.g.go('https://home.openweathermap.org/users/sign_in')
+        self.g.doc.set_input('user[email]', 'popov.anatoly@gmail.com')
+        self.g.doc.set_input('user[password]', '20111982')
+        self.g.doc.submit()
+        self.g.go('https://home.openweathermap.org/api_keys')
+        self.api_key = self.g.doc.rex_search(re.compile('<td>\s<pre>(.+?)</pre>\s</td>')).group(1)
+        with open('app.id', 'r+', encoding='UTF-8') as f:
+            while f:
+                if self.api_key in f.readlines():
+                    print('it is here')
+                    break
+                else:
+                    f.write('\n'+self.api_key)
+                    print('api key written')
+                    break
+
+    def get_cities_list(self):
+        url = 'http://bulk.openweathermap.org/sample/city.list.json.gz'
+        file_name = url.split('/')[-1]
+        u = urllib.request.urlopen(url)
+        with u as response, open(file_name, 'wb') as out_file:
+            data = response.read()
+            out_file.write(data)
+        print('cities downloaded')
+
+
+class Appid(object):
+    pass
+
+class DBConnection(object):
+    pass
+
+app = Application()
+app.master.title('Weather application')
+
+app.mainloop()
 
