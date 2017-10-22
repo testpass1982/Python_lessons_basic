@@ -4,6 +4,9 @@ from grab import Grab
 import re
 import urllib.request
 import gzip
+import os
+import sqlite3
+from sqlite3 import Error
 
 """ 
 == OpenWeatherMap ==
@@ -133,58 +136,124 @@ class Application(tk.Frame):
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
         self.grid()
-        self.createWidgets()
-        self.appid = Appid()
         self.g = Grab()
         logging.basicConfig(level=logging.DEBUG)
+        if self.get_api_key():
+            self.api_key = self.get_api_key()
+        else:
+            self.api_key = 'No key'
+        self.createWidgets()
+        if not os.path.isfile('weatherapp.db'):
+            self.db_connect()
 
     def createWidgets(self):
-        self.label = tk.Label(self, text = """This is my weather app.
+        if len(self.api_key)<32:
+            self.label = tk.Label(self, text = """This is my weather app.
 Push button \'Get App_id\' below to register our app
 on OpenWeatherMap web-service""")
+        else:
+            self.label = tk.Label(self, text = """This is my weather app.
+We are ready to work with OpenWeatherMap web-service""")
         self.label.pack()
+        self.api_label = tk.Label(self, text = 'API key: '+self.api_key)
+        self.api_label.pack()
         self.quitButton = tk.Button(self, text = 'Quit', command=lambda: self.quit())
-        self.getappid_button = tk.Button(self, text = 'Get App id', command=lambda: self.getappid())
+        if len(self.api_key)<32:
+            self.getappid_button = tk.Button(self, text = 'Get API key', command=lambda: self.getappid())
+            self.getappid_button.pack()
         self.get_cities_list_button = tk.Button(self, text = 'Get cities list', command=lambda: self.get_cities_list())
-        self.getappid_button.pack()
         self.get_cities_list_button.pack()
         self.quitButton.pack()
 
     def getappid(self):
-        self.g.go('https://home.openweathermap.org/users/sign_in')
-        self.g.doc.set_input('user[email]', 'popov.anatoly@gmail.com')
-        self.g.doc.set_input('user[password]', '20111982')
-        self.g.doc.submit()
-        self.g.go('https://home.openweathermap.org/api_keys')
-        self.api_key = self.g.doc.rex_search(re.compile('<td>\s<pre>(.+?)</pre>\s</td>')).group(1)
-        with open('app.id', 'r+', encoding='UTF-8') as f:
-            while f:
-                if self.api_key in f.readlines():
-                    print('it is here')
-                    break
-                else:
-                    f.write('\n'+self.api_key)
-                    print('api key written')
-                    break
+        if not self.get_api_key():
+            self.g.go('https://home.openweathermap.org/users/sign_in')
+            self.g.doc.set_input('user[email]', 'popov.anatoly@gmail.com')
+            self.g.doc.set_input('user[password]', '20111982')
+            self.g.doc.submit()
+            self.g.go('https://home.openweathermap.org/api_keys')
+            self.api_key = self.g.doc.rex_search(re.compile('<td>\s<pre>(.+?)</pre>\s</td>')).group(1)
+            with open('app.id', 'r+', encoding='UTF-8') as f:
+                while f:
+                    if self.api_key in f.readlines():
+                        print('it is here')
+                        break
+                    else:
+                        f.write('\n'+self.api_key)
+                        print('api key written')
+                        break
+        else:
+            print('we already have api_key')
+        self.refresh_root_frame()
+
+    def get_api_key(self):
+        with open('app.id', 'r') as f:
+            for line in f:
+                if len(line) == 32:
+                    api_key=line
+                    return api_key
 
     def get_cities_list(self):
         url = 'http://bulk.openweathermap.org/sample/city.list.json.gz'
         file_name = url.split('/')[-1]
         u = urllib.request.urlopen(url)
-        with u as response, open(file_name, 'wb') as out_file:
-            data = response.read()
-            out_file.write(data)
-        print('cities downloaded')
+        if not os.path.isfile(file_name):
+            with u as response, open(file_name, 'wb') as out_file:
+                data = response.read()
+                out_file.write(data)
+            print('cities downloaded')
+        else:
+            print('cities already here')
+
+        if not os.path.isfile('cities.json'):
+            with open('cities.json', 'wb') as cities:
+                with gzip.open(file_name, 'rb') as zipped_cities:
+                    cities.write(zipped_cities.read())
+                    print('cities unzipped')
+
+    def db_connect(self):
+        """== Сохранение данных в локальную БД ==
+        Программа должна позволять:
+        1. Создавать файл базы данных SQLite со следующей структурой данных
+        (если файла базы данных не существует):
+
+        Погода
+        id_города           INTEGER PRIMARY KEY
+        Город               VARCHAR(255)
+        Дата                DATE
+        Температура         INTEGER
+        id_погоды           INTEGER                 # weather.id из JSON-данных"""
+        try:
+            conn = sqlite3.connect('weatherapp.db')
+            print(sqlite3.version)
+            c = conn.cursor()
+
+            c.execute("""CREATE TABLE cities
+                    (id integer PRIMARY KEY,
+                    city text NOT NULL,
+                    date DATE NOT NULL,
+                    temperature integer,
+                    weather_id integer);""")
+
+            conn.commit()
+            conn.close()
+
+        except Error as e:
+            print(e)
+
+        finally:
+            conn.close()
 
 
-class Appid(object):
-    pass
+    def write_to_db(self):
+        pass
 
-class DBConnection(object):
-    pass
+    def refresh_root_frame(self):
+        for widget in self.winfo_children():
+                widget.destroy()
+        self.createWidgets()
 
 app = Application()
 app.master.title('Weather application')
-
 app.mainloop()
 
