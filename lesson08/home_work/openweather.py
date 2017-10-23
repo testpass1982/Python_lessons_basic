@@ -7,6 +7,8 @@ import gzip
 import os
 import sqlite3
 from sqlite3 import Error
+import json
+from datetime import date
 
 """ 
 == OpenWeatherMap ==
@@ -132,6 +134,7 @@ OpenWeatherMap — онлайн-сервис, который предостав�
 
 """
 
+
 class Application(tk.Frame):
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
@@ -145,25 +148,108 @@ class Application(tk.Frame):
         self.createWidgets()
         if not os.path.isfile('weatherapp.db'):
             self.db_connect()
+        self.country_list = []
+        self.country_selected = ''
+        self.chosen_city = ''
+        self.chosen_city_id = ''
+        self.temp = 0
+        self.date = date.today().isoformat()
+        self.weather_id = ''
 
     def createWidgets(self):
-        if len(self.api_key)<32:
-            self.label = tk.Label(self, text = """This is my weather app.
+        if len(self.api_key) < 32:
+            self.label = tk.Label(self, text="""This is my weather app.
 Push button \'Get App_id\' below to register our app
 on OpenWeatherMap web-service""")
         else:
-            self.label = tk.Label(self, text = """This is my weather app.
+            self.label = tk.Label(self, text="""This is my weather app.
 We are ready to work with OpenWeatherMap web-service""")
         self.label.pack()
-        self.api_label = tk.Label(self, text = 'API key: '+self.api_key)
+        self.api_label = tk.Label(self, text='API key: ' + self.api_key)
         self.api_label.pack()
-        self.quitButton = tk.Button(self, text = 'Quit', command=lambda: self.quit())
-        if len(self.api_key)<32:
-            self.getappid_button = tk.Button(self, text = 'Get API key', command=lambda: self.getappid())
+        self.quitButton = tk.Button(self, text='Quit', command=lambda: self.quit())
+        if len(self.api_key) < 32:
+            self.getappid_button = tk.Button(self, text='Get API key', command=lambda: self.getappid())
             self.getappid_button.pack()
-        self.get_cities_list_button = tk.Button(self, text = 'Get cities list', command=lambda: self.get_cities_list())
+        self.get_cities_list_button = tk.Button(self, text='Get cities list', command=lambda: self.get_cities_list())
         self.get_cities_list_button.pack()
+        self.show_cities_list_button = tk.Button(self, text='Show weather in cities',
+                                                 command=lambda: self.cities_child_window())
+        self.show_cities_list_button.pack()
         self.quitButton.pack()
+
+    def cities_child_window(self):
+        t = tk.Toplevel(self)
+        t.wm_title("Weather in cities")
+        l = tk.Label(t, text='Please, choose a country to show weather in it')
+        l.pack(side="top", fill="both", expand=True)  # padx=100, pady=10
+        listbox = tk.Listbox(t)
+        listbox.pack(side='left')
+        show_cities_button = tk.Button(t, text='Show cities', command=lambda: _sel_city())
+        show_cities_button.pack()
+
+        with open('cities.json', 'r', encoding='UTF-8') as c:
+            cities_json = c.read()
+            cities_data_decoded = json.JSONDecoder().decode(cities_json)
+            country_list = []
+            for i in cities_data_decoded:
+                if i['country'] not in country_list:
+                    country_list.append(i['country'])
+            sorted_country_list = sorted(country_list)
+            for i in sorted_country_list:
+                listbox.insert(tk.END, i)
+
+        self.country_list = country_list
+
+        def _sel_city():
+            self.country_selected = sorted_country_list[listbox.curselection()[0]]
+            self.show_cities_in_country()
+
+    def show_cities_in_country(self):
+        t = tk.Toplevel(self)
+        t.wm_title("Choose a city")
+        l = tk.Label(t, text='Please choose a city to show weather in it')
+        l.pack(side="top", fill="both", expand=True)
+        listbox_cities = tk.Listbox(t)
+        listbox_cities.pack(side='left')
+        show_weather_in_city_button = tk.Button(t, text='Show weather in city', command=lambda: choose_city())
+        show_weather_in_city_button.pack()
+
+        with open('cities.json', 'r', encoding='UTF-8') as c:
+            cities = []
+            city_ids = []
+            cities_json = c.read()
+            cities_data_decoded = json.JSONDecoder().decode(cities_json)
+            for i in cities_data_decoded:
+                if self.country_selected == i['country']:
+                    listbox_cities.insert(tk.END, i['name'])
+                    cities.append(i['name'])
+                    city_ids.append(i['id'])
+
+        def choose_city():
+            self.chosen_city = cities[listbox_cities.curselection()[0]]
+            self.chosen_city_id = city_ids[listbox_cities.curselection()[0]]
+            self.show_weather()
+            self.weather_window()
+            self.write_to_db(self.chosen_city_id, self.chosen_city, self.date, self.temp, self.weather_id)
+
+    def weather_window(self):
+        t = tk.Toplevel(self)
+        weather_string = 'The  temp in {} is {} now (on {})'.format(self.chosen_city, self.temp, self.date)
+        weather_label = tk.Label(t, text=weather_string)
+        if self.chosen_city_id != '':
+            weather_label.pack(expand=True, padx=100, pady=100)
+
+    def show_weather(self):
+        # Для получения температуры по Цельсию:
+        # http://api.openweathermap.org/data/2.5/weather?id=520068&units=metric&appid=b1b15e88fa797225412429c1c50c122a
+        link = 'http://api.openweathermap.org/data/2.5/weather'
+        id_link = '?id={}&units=metric&appid={}'.format(self.chosen_city_id, self.api_key)
+        url = link + id_link
+        with urllib.request.urlopen(url) as url:
+            data = json.loads(url.read().decode())
+            self.temp = data['main']['temp']
+            self.weather_id = data['weather'][0]['id']
 
     def getappid(self):
         if not self.get_api_key():
@@ -179,7 +265,7 @@ We are ready to work with OpenWeatherMap web-service""")
                         print('it is here')
                         break
                     else:
-                        f.write('\n'+self.api_key)
+                        f.write('\n' + self.api_key)
                         print('api key written')
                         break
         else:
@@ -190,7 +276,7 @@ We are ready to work with OpenWeatherMap web-service""")
         with open('app.id', 'r') as f:
             for line in f:
                 if len(line) == 32:
-                    api_key=line
+                    api_key = line
                     return api_key
 
     def get_cities_list(self):
@@ -234,26 +320,34 @@ We are ready to work with OpenWeatherMap web-service""")
                     date DATE NOT NULL,
                     temperature integer,
                     weather_id integer);""")
-
             conn.commit()
             conn.close()
-
         except Error as e:
             print(e)
-
         finally:
             conn.close()
 
-
-    def write_to_db(self):
-        pass
+    def write_to_db(self, city_id, city_name, date, temp, weather_id):
+        try:
+            conn = sqlite3.connect('weatherapp.db')
+            c = conn.cursor()
+            # INSERT INTO cities VALUES (3039676, "Parròquia d'Ordino", '2017-10-23', 11.86, 800)
+            query = 'INSERT INTO cities VALUES({},"{}","{}",{},{})'.format(city_id, city_name, date, temp, weather_id)
+            c.execute(query)
+            conn.commit()
+            conn.close()
+            print('successfully written to database')
+        except Error as e:
+            print(e)
+        finally:
+            conn.close()
 
     def refresh_root_frame(self):
         for widget in self.winfo_children():
-                widget.destroy()
+            widget.destroy()
         self.createWidgets()
+
 
 app = Application()
 app.master.title('Weather application')
 app.mainloop()
-
